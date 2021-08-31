@@ -44,13 +44,13 @@ We provide two machine learning tasks as showcases, one for 5-fold Cross-validat
 
 
 - Run task on HPC facility:
-By coupling python-interface SLURM scripters and self-contained ML tasks, now you can run these two tasks on High Performance Computing (HPC) facility. For install, running 5-fold Cross-validation task by given computational resource of 40 CPUs and 3 hours title with "test".
+By coupling python-interface SLURM scripters and self-contained ML tasks, now you can run these two tasks on High Performance Computing (HPC) facility. For install, running 5-fold Cross-validation task by given computational resource of 40 CPUs and 3 hours titled with "test".
 ```bash
   python launch.py --num-cpus 40 -t 03:00:00  --exp-name test --command "python -u main.py --task CV5 --uuid \$redis_password"
 ```
 
 
-- Ru extrapolation task via:
+- Run extrapolation task via:
 ```bash
   python launch.py --num-cpus 40 -t 03:00:00  --exp-name test --command "python -u main.py --task Extrapolation --uuid \$redis_password"
 ```
