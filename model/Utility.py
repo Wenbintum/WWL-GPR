@@ -257,8 +257,8 @@ class BayOptCv(GraphBase):
         res = gp_minimize(
                         func            = partial(self._LossFunc, name_hypers=name_hypers, fix_hypers=fix_hypers),
                         dimensions      = dimensions,
-                        n_calls         = 50, #
-                        n_random_starts = 30,
+                        n_calls         = 300, #
+                        n_random_starts = 200,
                         acq_func        = "EI",
                         x0              = default_para,
                         xi              = 0.01,
