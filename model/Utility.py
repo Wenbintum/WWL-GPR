@@ -198,7 +198,7 @@ class BayOptCv(GraphBase):
         Returns:
             [type]: [description]
         """
-        print("GPR prediction beginning",self.train)
+        print("GPR prediction beginning")
         conc_db_graphs, conc_db_atoms = self._Predict_prepare(test_graphs, test_atoms, test_node_attributes)
         BayOptCv.default_gpr_hyper.update(dict(zip(name_hypers, optimized_hypers)))
         cutoff, inner_cutoff, inner_weight, outer_weight, noise_level, gpr_gamma, gpr_sigma = BayOptCv.default_gpr_hyper.values()

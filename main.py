@@ -60,7 +60,7 @@ def SCV5(
      
      """
      db_graphs, db_atoms, node_attributes, list_ads_energies, file_names = load_training_db(ml_dict)
-     
+     test_RMSEs = []
      skf=StratifiedKFold(n_splits=5, random_state=0, shuffle=True)
      for train_index, vali_index in skf.split(list_ads_energies, ClassifySpecies(file_names)):
      
@@ -105,8 +105,75 @@ def SCV5(
                     optimized_hypers     = res_opt.x,
                     name_hypers          = name_hypers
                )
-          print(test_RMSE)
-     print("Cross validation RMSE: ",np.mean(test_RMSE))
+          print("RMSE: ",test_RMSE)
+          test_RMSEs.append(test_RMSE)
+     print("Cross validation RMSE: ",np.mean(test_RMSEs))
+
+def SCV5_FHP(
+     ml_dict,            #ml setting
+     name_hypers,        #bayesian optimization
+     pre_hypers
+
+):
+     """
+     5-fold cross validation statified by adsorbate
+     
+     Args : 
+     num_cpus     (int)         : number of cpus for machine learning (used for ray job)
+     name_hypers  (list)        : names of hyperparameters
+     pre_hypers   (list)        : the value of predefined hyperparameters correspoding to name_hypers
+     
+     variable : 
+     db_graphs         (graphs object): graph representations (connectivity) of initial guess
+     db_atoms          (ASE atoms)    : atoms object of initial guess
+     node_attributes   (numpy matrix) : primary features or feature vector in the shape of samples*atoms*features
+     list_ads_energies (list)         : adsorption energies
+     file_names        (list)         : name of structures
+     
+     """
+     db_graphs, db_atoms, node_attributes, list_ads_energies, file_names = load_training_db(ml_dict)
+     test_RMSEs = []
+     skf=StratifiedKFold(n_splits=5, random_state=0, shuffle=True)
+     for train_index, vali_index in skf.split(list_ads_energies, ClassifySpecies(file_names)):
+     
+          train_db_graphs         = db_graphs[train_index]
+          train_db_atoms          = db_atoms[train_index]
+          train_node_attributes   = node_attributes[train_index]
+          train_list_ads_energies = list_ads_energies[train_index]
+          train_file_names        = file_names[train_index]
+
+          test_db_graphs          = db_graphs[vali_index]
+          test_db_atoms           = db_atoms[vali_index]
+          test_node_attributes    = node_attributes[vali_index]
+          test_list_ads_energies  = list_ads_energies[vali_index]
+          test_file_names         = file_names[vali_index]
+          #initialize bayesian optimization
+          bayoptcv = BayOptCv(
+               classifyspecies    = ClassifySpecies(train_file_names),
+               num_cpus           = int(ml_dict["num_cpus"]),
+               db_graphs          = train_db_graphs,
+               db_atoms           = train_db_atoms,
+               node_attributes    = train_node_attributes,
+               y                  = train_list_ads_energies,
+               drop_list          = None,
+               num_iter           = int(ml_dict["num_iter"]),
+               post_type          = ml_dict["post_type"],
+               filenames          = train_file_names
+               )
+          #input predefined hyperparameters.
+          
+          #prediction with the use of optimized hyperparameters
+          test_RMSE, test_pre            = bayoptcv.Predict(
+                    test_graphs          = test_db_graphs,
+                    test_atoms           = test_db_atoms,
+                    test_node_attributes = test_node_attributes,
+                    test_target          = test_list_ads_energies,
+                    optimized_hypers     = pre_hypers,
+                    name_hypers          = name_hypers
+               )
+          print("RMSE: ",test_RMSE)
+          test_RMSEs.append(test_RMSE)
+     print("Cross validation RMSE: ",np.mean(test_RMSEs))
 
 def Extrapolation(
      ml_dict,            #ml setting          
@@ -173,21 +240,18 @@ def Extrapolation(
 
 if __name__ == "__main__":
      parser = argparse.ArgumentParser(description='Physic-inspired Wassterian Weisfeiler-Lehman Graph Gaussian Process Regression')
-     parser.add_argument("--task", type=str, help="type of ML task", choices=["CV5", "Extrapolation"])
+     parser.add_argument("--task", type=str, help="type of ML task", choices=["CV5", "CV5_FHP", "Extrapolation"])
      parser.add_argument("--uuid", type=str, help="uuid for ray job in HPC")
      args   = parser.parse_args()
-     
      #! load_setting from input.yml
      print("Load ML setting from input.yml")
      with open('input.yml') as f:
           ml_dict = yaml.safe_load(f)
      #print(ml_dict)
-        
-     #! initialize ray for paralleization
-     ray.init(address=os.environ["ip_head"], _redis_password=args.uuid)
-     print("Nodes in the Ray cluster:", ray.nodes())
-
      if args.task == "CV5":
+          # #! initialize ray for paralleization
+          ray.init(address=os.environ["ip_head"], _redis_password=args.uuid)
+          print("Nodes in the Ray cluster:", ray.nodes())
           #! bayesian optimization setting
           cutoff       = Integer(name='cutoff',             low = 1,      high=5)
           inner_cutoff = Integer(name='inner_cutoff',       low = 1,      high=3)
@@ -224,6 +288,9 @@ if __name__ == "__main__":
           )
 
      if args.task == "Extrapolation":
+          # #! initialize ray for paralleization
+          ray.init(address=os.environ["ip_head"], _redis_password=args.uuid)
+          print("Nodes in the Ray cluster:", ray.nodes())
           #! extapolation under certain noise level
           noise_level  = 0.027825594022071243
           
@@ -260,4 +327,17 @@ if __name__ == "__main__":
                dimensions   = dimensions,
                fix_hypers   = fix_hypers,
                default_para = default_para
+          )
+
+     if args.task == "CV5_FHP":
+          #! initialize ray for paralleization
+          ray.init(num_cpus=ml_dict["num_cpus"])
+          print("Job running on {} cpus".format(ml_dict["num_cpus"]))
+          name_hypers  = ["cutoff", "inner_cutoff", "inner_weight", "outer_weight",'noise_level', "gpr_gamma", "gpr_sigma"]
+          pre_hypers   = [3,        1,              0.9310145125207465, 0.13672134599888425, 0.009130469320228592, 13.77103609259054, 1]
+          SCV5_FHP(
+               ml_dict,            #ml setting
+               name_hypers,        #bayesian optimization
+               pre_hypers
+
           )
