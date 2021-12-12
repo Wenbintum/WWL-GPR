@@ -1,6 +1,6 @@
-# Physic-inspired Wassterian Weisfeiler-Lehman Graph Gaussian Process Regression
+# Wassterian Weisfeiler-Lehman Graph Gaussian Process Regression (WWL-GPR)
 
-This software package provides implementations of Physic-inspired Wassterian Weisfeiler-Lehman Graph (PWWG) model that takes arbitrary initial guess of structures to predict material properties with a particular interest in handling complex adsorbates. 
+This software package provides implementations of Physic-inspired Wassterian Weisfeiler-Lehman Graph model that takes arbitrary initial guess of structures to predict material properties with a particular interest in handling complex adsorbates. 
 
 This model integrates a customized graph kernel with Gaussian Process Regression. The search of hyperparameters is done with Bayesian optimization implemented with scikit-optimize.
 
