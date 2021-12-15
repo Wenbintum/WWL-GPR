@@ -14,7 +14,6 @@
 #SBATCH --cpus-per-task={{NUM_CPUS_PER_NODE}}
 #SBATCH --time={{MAX_TIME}}
 #SBATCH --mem=20G
-#SBATCH --mail-user=wenbinxu@fhi-berlin.mpg.de
 #SBATCH --mail-type=END
 
 ### COSTUM setting

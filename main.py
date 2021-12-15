@@ -4,7 +4,8 @@ import pickle
 import ray
 import numpy as np
 from skopt.space import Real, Categorical,Integer
-from model.Utility import BayOptCv, ClassifySpecies
+from model.Utility import ClassifySpecies
+from model.WWL_GPR import BayOptCv
 import os, sys
 from sklearn.model_selection import KFold,LeaveOneOut,StratifiedKFold
 
@@ -35,35 +36,24 @@ def load_test_db(ml_dict):
      return db_graphs, db_atoms, node_attributes, list_ads_energies, file_names
 
 def SCV5(
-     ml_dict,            #ml setting
-     name_hypers,        #bayesian optimization
-     dimensions,
-     fix_hypers,
-     default_para
+     ml_dict,            
+     opt_dimensions,
+     default_para,
+     fix_hypers
 ):
+     """task1: 5-fold cross validation for in-domain prediction stratified by adsorbate
+     Args:
+         ml_dict        ([type]): ML setting
+         default_para   ([type]): user defined trials
+         opt_dimensions ([type]): dimensions object for skopt
+         fix_hypers     ([type]): fixed hyperparameters
      """
-     5-fold cross validation statified by adsorbate
      
-     Args : 
-     num_cpus     (int)         : number of cpus for machine learning (used for ray job)
-     name_hypers  (list)        : names of hyperparameter to be optimized
-     dimensions   (skopt object): dimensions (setting) of optimized hyperparameters
-     fix_hypers   (list)        : hyperparameters to be fixed
-     default_para (dict)        : initial guess or suggested points of hyperparameters
-     
-     variable : 
-     db_graphs         (graphs object): graph representations (connectivity) of initial guess
-     db_atoms          (ASE atoms)    : atoms object of initial guess
-     node_attributes   (numpy matrix) : primary features or feature vector in the shape of samples*atoms*features
-     list_ads_energies (list)         : adsorption energies
-     file_names        (list)         : name of structures
-     
-     """
      db_graphs, db_atoms, node_attributes, list_ads_energies, file_names = load_training_db(ml_dict)
      test_RMSEs = []
-     skf=StratifiedKFold(n_splits=5, random_state=0, shuffle=True)
+     f_times = 1
+     skf=StratifiedKFold(n_splits=5, random_state=25, shuffle=True)
      for train_index, vali_index in skf.split(list_ads_energies, ClassifySpecies(file_names)):
-     
           train_db_graphs         = db_graphs[train_index]
           train_db_atoms          = db_atoms[train_index]
           train_node_attributes   = node_attributes[train_index]
@@ -75,7 +65,7 @@ def SCV5(
           test_node_attributes    = node_attributes[vali_index]
           test_list_ads_energies  = list_ads_energies[vali_index]
           test_file_names         = file_names[vali_index]
-          
+
           #initialize bayesian optimization
           bayoptcv = BayOptCv(
                classifyspecies    = ClassifySpecies(train_file_names),
@@ -86,54 +76,47 @@ def SCV5(
                y                  = train_list_ads_energies,
                drop_list          = None,
                num_iter           = int(ml_dict["num_iter"]),
-               post_type          = ml_dict["post_type"],
+               pre_data_type      = ml_dict["pre_data_type"],
                filenames          = train_file_names
                )
+     
           #starting bayesian optimization to minimize likelihood
           res_opt                 = bayoptcv.BayOpt(
-          name_hypers             = name_hypers,
-          dimensions              = dimensions,
-          fix_hypers              = fix_hypers,
-          default_para            = default_para
-               )
+          opt_dimensions          = opt_dimensions,
+          default_para            = default_para,
+          fix_hypers              = fix_hypers
+          )
+          print("hyperparameters:" , res_opt.x) 
+          
           #prediction with the use of optimized hyperparameters
           test_RMSE, test_pre            = bayoptcv.Predict(
                     test_graphs          = test_db_graphs,
                     test_atoms           = test_db_atoms,
                     test_node_attributes = test_node_attributes,
                     test_target          = test_list_ads_energies,
-                    optimized_hypers     = res_opt.x,
-                    name_hypers          = name_hypers
+                    opt_hypers           = dict(zip(opt_dimensions.keys(), res_opt.x))
                )
-          print("RMSE: ",test_RMSE)
+          print(f"{f_times} fold RMSE: ",test_RMSE)
           test_RMSEs.append(test_RMSE)
+          f_times +=1 
      print("Cross validation RMSE: ",np.mean(test_RMSEs))
 
-def SCV5_FHP(
-     ml_dict,            #ml setting
-     name_hypers,        #bayesian optimization
-     pre_hypers
 
+def SCV5_FHP(
+     ml_dict,  
+     fix_hypers
 ):
+     """task2: 5-fold cross validation stratified by adsorbate with fixed hyperparameters
+
+     Args:
+         ml_dict    ([type]): ML setting
+         fix_hypers ([type]): fixed hyperparameters
      """
-     5-fold cross validation statified by adsorbate
      
-     Args : 
-     num_cpus     (int)         : number of cpus for machine learning (used for ray job)
-     name_hypers  (list)        : names of hyperparameters
-     pre_hypers   (list)        : the value of predefined hyperparameters correspoding to name_hypers
-     
-     variable : 
-     db_graphs         (graphs object): graph representations (connectivity) of initial guess
-     db_atoms          (ASE atoms)    : atoms object of initial guess
-     node_attributes   (numpy matrix) : primary features or feature vector in the shape of samples*atoms*features
-     list_ads_energies (list)         : adsorption energies
-     file_names        (list)         : name of structures
-     
-     """
      db_graphs, db_atoms, node_attributes, list_ads_energies, file_names = load_training_db(ml_dict)
      test_RMSEs = []
-     skf=StratifiedKFold(n_splits=5, random_state=0, shuffle=True)
+     f_times = 1
+     skf=StratifiedKFold(n_splits=5, random_state=25, shuffle=True)
      for train_index, vali_index in skf.split(list_ads_energies, ClassifySpecies(file_names)):
      
           train_db_graphs         = db_graphs[train_index]
@@ -147,7 +130,7 @@ def SCV5_FHP(
           test_node_attributes    = node_attributes[vali_index]
           test_list_ads_energies  = list_ads_energies[vali_index]
           test_file_names         = file_names[vali_index]
-          #initialize bayesian optimization
+          
           bayoptcv = BayOptCv(
                classifyspecies    = ClassifySpecies(train_file_names),
                num_cpus           = int(ml_dict["num_cpus"]),
@@ -157,53 +140,41 @@ def SCV5_FHP(
                y                  = train_list_ads_energies,
                drop_list          = None,
                num_iter           = int(ml_dict["num_iter"]),
-               post_type          = ml_dict["post_type"],
+               pre_data_type      = ml_dict["pre_data_type"],
                filenames          = train_file_names
                )
-          #input predefined hyperparameters.
-          
-          #prediction with the use of optimized hyperparameters
+
           test_RMSE, test_pre            = bayoptcv.Predict(
                     test_graphs          = test_db_graphs,
                     test_atoms           = test_db_atoms,
                     test_node_attributes = test_node_attributes,
                     test_target          = test_list_ads_energies,
-                    optimized_hypers     = pre_hypers,
-                    name_hypers          = name_hypers
+                    opt_hypers           = fix_hypers
                )
-          print("RMSE: ",test_RMSE)
+          print(f"{f_times} fold RMSE: ",test_RMSE)
           test_RMSEs.append(test_RMSE)
-     print("Cross validation RMSE: ",np.mean(test_RMSEs))
+          f_times +=1 
+     print("Cross validation RMSE: ", np.mean(test_RMSEs))
+
 
 def Extrapolation(
-     ml_dict,            #ml setting          
-     name_hypers,        #bayesian optimization
-     dimensions,
-     fix_hypers,
-     default_para
+     ml_dict,               
+     opt_dimensions,
+     default_para,
+     fix_hypers
+     
 ):
-     """
-     Training in domain and predict out of domain
-     
-     Args : 
-     num_cpus     (int)         : number of cpus for machine learning (used for ray job)
-     name_hypers  (list)        : names of hyperparameter to be optimized
-     dimensions   (skopt object): dimensions (setting) of optimized hyperparameters
-     fix_hypers   (list)        : hyperparameters to be fixed
-     default_para (dict)        : initial guess or suggested points of hyperparameters
-     
-     variable : 
-     db_graphs         (graphs object): graph representations (connectivity) of initial guess
-     db_atoms          (ASE atoms)    : atoms object of initial guess
-     node_attributes   (numpy matrix) : primary features or feature vector in the shape of samples*atoms*features
-     list_ads_energies (list)         : adsorption energies
-     file_names        (list)         : name of structures
-     
+     """task3: predict alloy when only training on pure metals
+
+     Args:
+         ml_dict      ([type]): ML setting
+         default_para ([type]): user defined trials
+         fix_hypers   ([type]): fixed hyperparameters
      """
      train_db_graphs, train_db_atoms, train_node_attributes, \
           train_list_ads_energies, train_file_names = load_training_db(ml_dict)
      test_db_graphs, test_db_atoms, test_node_attributes, \
-          test_list_ads_energies, test_file_names = load_test_db(ml_dict)
+          test_list_ads_energies, test_file_names   = load_test_db(ml_dict)
           
      #initialize bayesian optimization
      bayoptcv = BayOptCv(
@@ -215,129 +186,149 @@ def Extrapolation(
           y                  = train_list_ads_energies,
           drop_list          = None,
           num_iter           = int(ml_dict["num_iter"]),
-          post_type          = ml_dict["post_type"],
+          pre_data_type      = ml_dict["pre_data_type"],
           filenames          = train_file_names
           )
      
      #starting bayesian optimization to minimize likelihood
      res_opt                 = bayoptcv.BayOpt(
-     name_hypers             = name_hypers,
-     dimensions              = dimensions,
-     fix_hypers              = fix_hypers,
-     default_para            = default_para
+     opt_dimensions          = opt_dimensions,
+     default_para            = default_para,
+     fix_hypers              = fix_hypers
           )
      print("hyperparameters:" , res_opt.x) 
+     
      #prediction with the use of optimized hyperparameters
      test_RMSE, test_pre            = bayoptcv.Predict(
                test_graphs          = test_db_graphs,
                test_atoms           = test_db_atoms,
                test_node_attributes = test_node_attributes,
                test_target          = test_list_ads_energies,
-               optimized_hypers     = res_opt.x,
-               name_hypers          = name_hypers
+               opt_hypers           = dict(zip(opt_dimensions.keys(), res_opt.x))
           )
      print("extrapolation RMSE: ", test_RMSE)
 
+
 if __name__ == "__main__":
-     parser = argparse.ArgumentParser(description='Physic-inspired Wassterian Weisfeiler-Lehman Graph Gaussian Process Regression')
+     
+     parser = argparse.ArgumentParser(description='Physic-inspired Wassterien Weisfeiler-Lehman Graph Gaussian Process Regression')
      parser.add_argument("--task", type=str, help="type of ML task", choices=["CV5", "CV5_FHP", "Extrapolation"])
      parser.add_argument("--uuid", type=str, help="uuid for ray job in HPC")
      args   = parser.parse_args()
+     
      #! load_setting from input.yml
      print("Load ML setting from input.yml")
      with open('input.yml') as f:
           ml_dict = yaml.safe_load(f)
      #print(ml_dict)
+     
      if args.task == "CV5":
-          # #! initialize ray for paralleization
+          
+          #! initialize ray for paralleization
           ray.init(address=os.environ["ip_head"], _redis_password=args.uuid)
           print("Nodes in the Ray cluster:", ray.nodes())
-          #! bayesian optimization setting
-          cutoff       = Integer(name='cutoff',             low = 1,      high=5)
-          inner_cutoff = Integer(name='inner_cutoff',       low = 1,      high=3)
-          inner_weight = Real(name='inner_weight',          low = 0.8,    high=1,     prior='uniform')
-          outer_weight = Real(name='outer_weight',          low = 0.05,   high=0.15,  prior='uniform')
-          noise_level  = Real(name='noise level',           low = 1e-4,   high=1e0,   prior='uniform')
-          gpr_gamma    = Real(name='gamma of gpr',          low = 1e0,    high=100,   prior="uniform" )
-          gpr_sigma    = Real(name='sigma of gpr',          low = 1e-2,   high=100,   prior="uniform" )
-
-          name_hypers  = ["inner_weight", "outer_weight",'noise_level', "gpr_gamma"]
-          dimensions   = [inner_weight,    outer_weight,  noise_level,   gpr_gamma]
-          fix_hypers   = {    "cutoff" : 3,
-                              "inner_cutoff":1,
-                              "gpr_sigma": 1
+          
+          #cutoff       = Integer(name='cutoff',             low = 1,     high=5)
+          #inner_cutoff = Integer(name='inner_cutoff',       low = 1,     high=3)
+          inner_weight  = Real(name='inner_weight',          low = 0,     high=1,     prior='uniform')
+          outer_weight  = Real(name='outer_weight',          low = 0,     high=1,  prior='uniform') 
+          gpr_reg       = Real(name='regularization of gpr', low = 1e-3,  high=1e0,   prior='uniform')  
+          gpr_len       = Real(name='lengthscale of gpr',    low = 1,     high=100,   prior="uniform")
+          #gpr_sigma    = 1 
+          edge_s_s      = Real(name='edge weight of surface-surface',      low = 0,      high=1,     prior="uniform")
+          edge_s_a      = Real(name='edge weight of surface-adsorbate',    low = 0,      high=1,     prior="uniform")
+          edge_a_a      = Real(name='edge weight of adsorbate-adsorbate',  low = 0,      high=1,     prior="uniform")
+          
+          fix_hypers      = { "cutoff"        : 2,
+                              "inner_cutoff"  : 1,
+                              "gpr_sigma"     : 1
                               }
-          default_para =     [[           0.9,          0.05,          1e-3,              30],
-                              [           0.9,          0.1,           1e-1,              20],
-                              [           0.9,          0.1,           1e-2,              30],
-                              [           0.9,          0.1,           1e-3,              30],
-                              [           0.9,          0.15,          1e-3,              30],
-                              [           0.9,          0.1,           1e-3,              50],
-                              [           0.9,          0.1,           1e-3,              10],
-                              [0.8806875258840565, 0.1327365239845043,  0.009517359358533482, 13.927053762282942],
-                              [0.941112318815508,  0.1428003912851984,  0.00924305190195764,  13.832911819240726],
-                              [0.9310145125207465, 0.13672134599888425, 0.009130469320228592, 13.77103609259054]
-          ]
 
+          opt_dimensions    =   {    
+                              "inner_weight"      : inner_weight,
+                              "outer_weight"      : outer_weight,
+                              "gpr_reg"           : gpr_reg, 
+                              "gpr_len"           : gpr_len,  
+                              "edge_s_s"          : edge_s_s,
+                              "edge_s_a"          : edge_s_a,
+                              "edge_a_a"          : edge_a_a
+                              } 
+
+          default_para   =  [[1.0,  0,        0.03,   30,  0,         1,  0],
+                              [0.6,  0.0544362754971445, 0.00824480194221483, 11.4733820390901, 0, 1, 0.6994924119498536]
+                              ]
+          
           SCV5(
-          ml_dict      = ml_dict,        
-          name_hypers  = name_hypers,
-          dimensions   = dimensions,
-          fix_hypers   = fix_hypers,
-          default_para = default_para
+               ml_dict        = ml_dict,
+               opt_dimensions = opt_dimensions,
+               default_para   = default_para,
+               fix_hypers     = fix_hypers
           )
+
 
      if args.task == "Extrapolation":
-          # #! initialize ray for paralleization
+          
+          #! initialize ray for paralleization
           ray.init(address=os.environ["ip_head"], _redis_password=args.uuid)
           print("Nodes in the Ray cluster:", ray.nodes())
-          #! extapolation under certain noise level
-          noise_level  = 0.027825594022071243
           
-          cutoff       = Integer(name='cutoff',             low = 1,      high=5)
-          inner_cutoff = Integer(name='inner_cutoff',       low = 1,      high=3)
-          inner_weight = Real(name='inner_weight',          low = 0.8,    high=1,     prior='uniform')
-          outer_weight = Real(name='outer_weight',          low = 0.05,   high=0.15,  prior='uniform')
-          #noise_level  = Real(name='noise level', low = 1e-4,   high=1e0,   prior='uniform')
-          gpr_gamma    = Real(name='gamma of gpr',          low = 1e0,    high=100,   prior="uniform" )
+          #! extrapolation with certain regularization and lengthscale
+          inner_weight  = Real(name='inner_weight',          low = 0,     high=1,     prior='uniform')
+          outer_weight  = Real(name='outer_weight',          low = 0,     high=1,  prior='uniform') 
+          edge_s_s      = Real(name='edge weight of surface-surface',      low = 0,      high=1,     prior="uniform")
+          edge_s_a      = Real(name='edge weight of surface-adsorbate',    low = 0,      high=1,     prior="uniform")
+          edge_a_a      = Real(name='edge weight of adsorbate-adsorbate',  low = 0,      high=1,     prior="uniform")
+          
+          fix_hypers      = { "cutoff"        : 2,
+                              "inner_cutoff"  : 1,
+                              "gpr_reg"       : 0.0525554561285561, 
+                              "gpr_len"       : 13.410525101483,  
+                              "gpr_sigma"     : 1
+                            }
 
-          name_hypers    = ["inner_weight", "outer_weight", "gpr_gamma"]
-          dimensions     = [inner_weight,    outer_weight,   gpr_gamma ]
+          opt_dimensions    =   {    
+                              "inner_weight"      : inner_weight,
+                              "outer_weight"      : outer_weight,
+                              "edge_s_s"          : edge_s_s,
+                              "edge_s_a"          : edge_s_a,
+                              "edge_a_a"          : edge_a_a
+                             } 
 
-          fix_hypers      = { "cutoff" : 3,
-                              "inner_cutoff":1,
-                              "noise_level": noise_level,
-                              "gpr_sigma": 1
-                              }
-
-          default_para   =   [[           0.9,          0.05,               30],
-                              [           0.9,          0.1,                20],
-                              [           0.9,          0.1,                30],
-                              [           0.9,          0.1,                30],
-                              [           0.9,          0.15,               30],
-                              [           0.9,          0.1,                50],
-                              [           0.9,          0.1,                10],
-                              [0.8806875258840565,      0.1327365239845043, 13.927053762282942],
-                              [0.941112318815508,       0.1428003912851984, 13.832911819240726],
-                              [0.9310145125207465,      0.13672134599888425,13.77103609259054],
-                              [0.9549620018328902,      0.1384413929381768, 16.06832238503717]]
+          default_para   =  [[1.0,  0,                  0, 1,  0],
+                             [0.6,  0.0694050764384062, 0, 1, 0.47921973652378186]
+                            ]
+          
           Extrapolation(
-               ml_dict      = ml_dict,
-               name_hypers  = name_hypers,
-               dimensions   = dimensions,
-               fix_hypers   = fix_hypers,
-               default_para = default_para
+               ml_dict        = ml_dict,
+               opt_dimensions = opt_dimensions,
+               default_para   = default_para,
+               fix_hypers     = fix_hypers
           )
-
+          
+          
      if args.task == "CV5_FHP":
+          
           #! initialize ray for paralleization
-          ray.init(num_cpus=ml_dict["num_cpus"])
-          print("Job running on {} cpus".format(ml_dict["num_cpus"]))
-          name_hypers  = ["cutoff", "inner_cutoff", "inner_weight", "outer_weight",'noise_level', "gpr_gamma", "gpr_sigma"]
-          pre_hypers   = [3,        1,              0.9310145125207465, 0.13672134599888425, 0.009130469320228592, 13.77103609259054, 1]
-          SCV5_FHP(
-               ml_dict,            #ml setting
-               name_hypers,        #bayesian optimization
-               pre_hypers
+          ray.init(address=os.environ["ip_head"], _redis_password=args.uuid)
+          print("Nodes in the Ray cluster:", ray.nodes())
 
+          #! running on local desktop or laptop
+          #ray.init(num_cpus=ml_dict["num_cpus"])
+          #print("Job running on {} cpus".format(ml_dict["num_cpus"]))
+          
+          fix_hypers =   {    "cutoff"            : 2,
+                              "inner_cutoff"      : 1,
+                              "inner_weight"      : 0.6,
+                              "outer_weight"      : 0.0544362754971445,
+                              "gpr_reg"           : 0.00824480194221483, 
+                              "gpr_len"           : 11.4733820390901, 
+                              "gpr_sigma"         : 1,              
+                              "edge_s_s"          : 0,
+                              "edge_s_a"          : 1,
+                              "edge_a_a"          : 0.6994924119498536
+                         } 
+
+          SCV5_FHP(
+               ml_dict, 
+               fix_hypers
           )

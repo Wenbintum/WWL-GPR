@@ -1,22 +1,22 @@
 num_cpus:
-  10
+  8
 
 num_iter:
   1
 
-post_type:
+pre_data_type:
   "Standardize"
 
 database:
-  db_atoms         : "./database/1418_atoms.pickle"
-  db_graphs        : "./database/1418_graphs.pickle"
-  node_attributes  : "./database/1418_node_attributes.pickle"
-  target_properties: "./database/1418_ads_energies.pickle"
-  file_names       : "./database/1418_file_names.pickle"
+  db_atoms         : "./database/puremetal_atoms.pickle"
+  db_graphs        : "./database/puremetal_graphs.pickle"
+  node_attributes  : "./database/puremetal_node_attributes.pickle"
+  target_properties: "./database/puremetal_ads_energies.pickle"
+  file_names       : "./database/puremetal_filenames.pickle"
 
 test_database:
   db_atoms         : "./database/alloy_atoms.pickle"
   db_graphs        : "./database/alloy_graphs.pickle"
   node_attributes  : "./database/alloy_node_attributes.pickle"
   target_properties: "./database/alloy_ads_energies.pickle"
-  file_names       : "./database/alloy_file_names.pickle"
+  file_names       : "./database/alloy_filenames.pickle"

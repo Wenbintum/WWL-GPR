@@ -12,16 +12,16 @@ We made the easiest way to install prerequisites via [conda](https://conda.io/do
 
 Firstly, download or clone this repository via:
 ```bash
-git clone https://github.com/Wenbintum/pwwg-model.git
+git clone https://github.com/Wenbintum/WWL-GPR.git
 ```
 
-Ensure you have installed conda, and then run the following commands to create a new environment named pwwg-model.
+Ensure you have installed conda, and then run the following commands to create a new environment named wwl-gpr.
 ```bash
 conda env create -f env.yml
 ```
 Activate the conda environment with:
 ```bash
-conda activate pwwg-model
+conda activate wwl-gpr
 ```
 
 ## Usage
@@ -48,11 +48,15 @@ By coupling python-interface SLURM scripters and self-contained ML tasks, now yo
 ```bash
   python launch.py --num-cpus 40 -t 03:00:00  --exp-name test --command "python -u main.py --task CV5 --uuid \$redis_password"
 ```
-
-
-- Ru extrapolation task via:
+&emsp;&ensp; Ru extrapolation task via:
 ```bash
   python launch.py --num-cpus 40 -t 03:00:00  --exp-name test --command "python -u main.py --task Extrapolation --uuid \$redis_password"
+```
+
+We also provide a showcase for running 5-fold Cross-validation of in-domain prediction on local desktop or laptop with fixed hyperparameters (FHP). In this case, the ML learning will be run on 8 CPUS as given in [input.yml](https://github.com/Wenbintum/WWL-GPR/blob/main/input.yml).
+- Run task on local desktop or laptop:
+```bash
+  python main.py --task CV5_FHP
 ```
 
 ## Authors
