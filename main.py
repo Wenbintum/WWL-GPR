@@ -309,12 +309,12 @@ if __name__ == "__main__":
      if args.task == "CV5_FHP":
           
           #! initialize ray for paralleization
-          ray.init(address=os.environ["ip_head"], _redis_password=args.uuid)
-          print("Nodes in the Ray cluster:", ray.nodes())
+          #ray.init(address=os.environ["ip_head"], _redis_password=args.uuid)
+          #print("Nodes in the Ray cluster:", ray.nodes())
 
           #! running on local desktop or laptop
-          #ray.init(num_cpus=ml_dict["num_cpus"])
-          #print("Job running on {} cpus".format(ml_dict["num_cpus"]))
+          ray.init(num_cpus=ml_dict["num_cpus"])
+          print("Job running on {} cpus".format(ml_dict["num_cpus"]))
           
           fix_hypers =   {    "cutoff"            : 2,
                               "inner_cutoff"      : 1,
