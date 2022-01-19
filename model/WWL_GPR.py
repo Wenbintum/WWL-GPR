@@ -191,7 +191,7 @@ class BayOptCv(GraphBase):
         preprocessing_node_attributes = self.Preprocessing_NodeAttr(self.drop_list,
                                                                     self.node_attributes,
                                                                     test_node_attributes)
-        self.post_node_attributes = R_conv_attributes(conc_db_graphs, preprocessing_node_attributes,num_iterations=self.num_iter,
+        self.post_node_attributes = R_conv_attributes(conc_db_graphs, preprocessing_node_attributes, num_iterations=self.num_iter,
                                                       gpr_hypers_dict=gpr_hypers_dict, db_atoms=conc_db_atoms)
         return conc_db_graphs, conc_db_atoms
     
@@ -300,7 +300,8 @@ class BayOptCv(GraphBase):
            self._LossFunc(hyperpars=dimensions, name_hypers=name_hypers, fix_hypers=fix_hypers, preprocess_node_attributes=preprocess_node_attributes)
         else:
             res = gp_minimize(
-                            func            = partial(self._LossFunc, name_hypers=name_hypers, fix_hypers=fix_hypers, preprocess_node_attributes=preprocess_node_attributes),
+                            func            = partial(self._LossFunc, name_hypers=name_hypers, fix_hypers=fix_hypers, 
+                                                      preprocess_node_attributes=preprocess_node_attributes),
                             dimensions      = dimensions,
                             n_calls         = 3,
                             n_random_starts = 1,
@@ -456,5 +457,6 @@ def R_conv_attributes(X, node_features = None, num_iterations=3, gpr_hypers_dict
         pass
     else:
         es = ContinuousWeisfeilerLehman()
-        node_representations = es.fit_transform(X, node_features=node_features, num_iterations=num_iterations, gpr_hypers_dict=gpr_hypers_dict, db_atoms=db_atoms)
+        node_representations = es.fit_transform(X, node_features=node_features, num_iterations=num_iterations, 
+                                                gpr_hypers_dict=gpr_hypers_dict, db_atoms=db_atoms)
     return node_representations
