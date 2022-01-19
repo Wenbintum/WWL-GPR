@@ -62,5 +62,8 @@ We also provide a showcase for running 5-fold Cross-validation of in-domain pred
 ## Authors
 This software was primarily written by Wenbin Xu who was advised by Prof. Mie Andersen.
 
+## Acknowledgements
+The WWL-GPR implementation is based on the [Wasserstein Weisfeiler-Lehman Graph Kernels](https://arxiv.org/abs/1906.01277)
+
 ## License
 PWWG-GPR is released under the MIT License.
