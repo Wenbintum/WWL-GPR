@@ -1,5 +1,7 @@
 # Wasserstein Weisfeiler-Lehman Graph Gaussian Process Regression (WWL-GPR)
-![image](https://github.com/Wenbintum/WWL-GPR/tree/main/resource/Schematic.png)
+<p align="center">
+  <img width="800" src="https://github.com/Wenbintum/WWL-GPR/tree/main/resource/Schematic.png">
+</p>
 
 
 
