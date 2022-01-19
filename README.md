@@ -1,9 +1,4 @@
 # Wasserstein Weisfeiler-Lehman Graph Gaussian Process Regression (WWL-GPR)
-<p align="center">
-  <img width="800" src="https://github.com/Wenbintum/WWL-GPR/tree/main/resource/Schematic.png">
-</p>
-
-
 
 This software package provides implementations of Physic-inspired Wasserstein Weisfeiler-Lehman Graph model that takes arbitrary initial guess of structures to predict material properties with a particular interest in handling complex adsorbates. 
 
