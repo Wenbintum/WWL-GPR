@@ -61,7 +61,7 @@ By coupling python-interface SLURM scripts and self-contained ML tasks, now you 
   python launch.py --num-cpus 40 -t 03:00:00  --exp-name test --command "python -u main.py --task Extrapolation --uuid \$redis_password"
 ```
 #### Run task on local computer:
-We also provide a showcase for running 5-fold Cross-validation of in-domain prediction for complex adsorbates database on local desktop or laptop with fixed hyperparameters (FHP). In this case, the ML learning will be run on 8 CPUS as given in [input.yml](https://github.com/Wenbintum/WWL-GPR/blob/main/database/complexads_interpolation/input.yml).
+We also provide a showcase for running 5-fold Cross-validation of in-domain prediction for complex adsorbates database on local desktop or laptop with fixed hyperparameters (FHP). In this case, the ML learning will be run on 8 CPUs as given in [input.yml](https://github.com/Wenbintum/WWL-GPR/blob/main/database/complexads_interpolation/input.yml).
 - Run task on local desktop or laptop:
 ```bash
   python main.py --task CV5_FHP
