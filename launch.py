@@ -8,7 +8,7 @@ import time
 
 from pathlib import Path
 
-template_file = Path('./model/sbatch_template.sh')
+template_file = Path('./wwlgpr/sbatch_template.sh')
 
 JOB_NAME = "{{JOB_NAME}}"
 MAX_TIME = "{{MAX_TIME}}"

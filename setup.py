@@ -8,7 +8,7 @@ from setuptools import find_packages, setup
 
 
 setup(
-    name='wwl_model',
+    name='wwlgpr',
     version = "0.1.3",
     packages=find_packages()
 )

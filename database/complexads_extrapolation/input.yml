@@ -1,0 +1,23 @@
+num_cpus:
+  8
+
+num_iter:
+  1
+
+pre_data_type:
+  "Standardize"
+
+
+database:
+  db_atoms         : "/database/complexads_extrapolation/extend_puremetal_atoms.pickle"
+  db_graphs        : "/database/complexads_extrapolation/extend_puremetal_graphs.pickle"
+  node_attributes  : "/database/complexads_extrapolation/extend_puremetal_node_attributes.pickle"
+  target_properties: "/database/complexads_extrapolation/extend_puremetal_ads_energies.pickle"
+  file_names       : "/database/complexads_extrapolation/extend_puremetal_filenames.pickle"
+
+test_database:
+  db_atoms         : "/database/complexads_extrapolation/CuCo_Pt_atoms.pickle"
+  db_graphs        : "/database/complexads_extrapolation/CuCo_Pt_graphs.pickle"
+  node_attributes  : "/database/complexads_extrapolation/CuCo_Pt_node_attributes.pickle"
+  target_properties: "/database/complexads_extrapolation/CuCo_Pt_ads_energies.pickle"
+  file_names       : "/database/complexads_extrapolation/CuCo_Pt_filenames.pickle"

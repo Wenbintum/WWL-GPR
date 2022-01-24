@@ -1,0 +1,15 @@
+num_cpus:
+  8
+
+num_iter:
+  1
+
+pre_data_type:
+  "Standardize"
+
+database:
+  db_atoms         : "/database/simpleads_interpolation/simpleads_atoms.pickle"
+  db_graphs        : "/database/simpleads_interpolation/simpleads_graphs.pickle"
+  node_attributes  : "/database/simpleads_interpolation/simpleads_node_attributes.pickle"
+  target_properties: "/database/simpleads_interpolation/simpleads_ads_energies.pickle"
+  file_names       : "/database/simpleads_interpolation/simpleads_filenames.pickle"
