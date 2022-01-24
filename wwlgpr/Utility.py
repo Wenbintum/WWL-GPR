@@ -130,6 +130,14 @@ def ClassifySpecies(filenames):
          classify_list.append(np.argwhere(np.array(adsorbate_list) == key)[0][0])
     return classify_list
 
+def writetofolder(name):
+    _path = os.path.dirname(name)
+    if not os.path.exists(_path):
+       os.makedirs(_path)
+    with open(name, "a") as infile:
+        infile.write("sample, real_y, predicted_y")
+        infile.write("\n")
+
 def writetofile(name,i,j,k):
     for i,j,k in zip(i,j,k):
         with open(name, "a") as infile:

@@ -4,7 +4,7 @@ import pickle
 import ray
 import numpy as np
 from skopt.space import Real, Categorical,Integer
-from wwlgpr.Utility import ClassifySpecies, writetofile
+from wwlgpr.Utility import ClassifySpecies, writetofile, writetofolder
 from wwlgpr.WWL_GPR import BayOptCv
 import wwlgpr
 import os, sys
@@ -97,6 +97,7 @@ def SCV5(
           print(f"{f_times} fold RMSE: ",test_RMSE)
           test_RMSEs.append(test_RMSE)
           f_times +=1
+          writetofolder(output_name)
           writetofile(output_name, test_file_names, test_list_ads_energies, test_pre)
      print("Cross validation RMSE: ",np.mean(test_RMSEs))
 
@@ -152,14 +153,13 @@ def SCV5_FHP(
           print(f"{f_times} fold RMSE: ",test_RMSE)
           test_RMSEs.append(test_RMSE)
           f_times +=1
+          writetofolder(output_name)
           writetofile(output_name, test_file_names, test_list_ads_energies, test_pre)
      print("Cross validation RMSE: ", np.mean(test_RMSEs))
 
 
 def Extrapolation(
-     ml_dict,               
-     # opt_dimensions,
-     # default_para,
+     ml_dict,           
      fix_hypers
      
 ):
@@ -168,7 +168,6 @@ def Extrapolation(
 
      Args:
          ml_dict      ([type]): ML setting
-         default_para ([type]): user defined trials
          fix_hypers   ([type]): fixed hyperparameters
      """
      global output_name
@@ -198,56 +197,24 @@ def Extrapolation(
                test_target          = test_list_ads_energies,
                opt_hypers           = fix_hypers
           )
+     writetofolder(output_name)
      writetofile(output_name, test_file_names, test_list_ads_energies, test_pre)
      print("extrapolation RMSE: ", test_RMSE)
 
-     # #initialize bayesian optimization
-     # bayoptcv = BayOptCv(
-     #      classifyspecies    = ClassifySpecies(train_file_names),
-     #      num_cpus           = int(ml_dict["num_cpus"]),
-     #      db_graphs          = train_db_graphs,
-     #      db_atoms           = train_db_atoms,
-     #      node_attributes    = train_node_attributes,
-     #      y                  = train_list_ads_energies,
-     #      drop_list          = None,
-     #      num_iter           = int(ml_dict["num_iter"]),
-     #      pre_data_type      = ml_dict["pre_data_type"],
-     #      filenames          = train_file_names
-     #      )
-     
-     # #starting bayesian optimization to minimize likelihood
-     # res_opt                 = bayoptcv.BayOpt(
-     # opt_dimensions          = opt_dimensions,
-     # default_para            = default_para,
-     # fix_hypers              = fix_hypers
-     #      )
-     # print("hyperparameters:" , res_opt.x) 
-     
-     # #prediction with the use of optimized hyperparameters
-     # test_RMSE, test_pre            = bayoptcv.Predict(
-     #           test_graphs          = test_db_graphs,
-     #           test_atoms           = test_db_atoms,
-     #           test_node_attributes = test_node_attributes,
-     #           test_target          = test_list_ads_energies,
-     #           opt_hypers           = dict(zip(opt_dimensions.keys(), res_opt.x))
-     #      )
-     # print("extrapolation RMSE: ", test_RMSE)
-
-
 if __name__ == "__main__":
      
-     parser = argparse.ArgumentParser(description='Physic-inspired Wassterien Weisfeiler-Lehman Graph Gaussian Process Regression')
-     parser.add_argument("--task", type=str, help="type of ML task", choices=["CV5", "CV5_FHP", "Extrapolation", "CV5_simpleads"])
-     parser.add_argument("--uuid", type=str, help="uuid for ray job in HPC")
+     parser = argparse.ArgumentParser(description='Physic-inspired Wasserstein Weisfeiler-Lehman Graph Gaussian Process Regression')
+     parser.add_argument("--task",   type=str, help="type of ML task", choices=["CV5", "CV5_FHP", "Extrapolation", "CV5_simpleads"])
+     parser.add_argument("--uuid",   type=str, help="uuid for ray job in HPC")
      parser.add_argument("--output", type=str, help="output file name")
-
      args   = parser.parse_args()
      
      base_path = load_base_path()
+     
      if args.output:
-        output_name = base_path + "/output/" + args.output + ".txt"
+        output_name = base_path + "/results/" + args.output + ".txt"
      else:
-        output_name = base_path + "/output/" + time.asctime() + ".txt"
+        output_name = base_path + "/results/" + time.asctime() + ".txt"
 
      if args.task == "CV5":
 
@@ -297,7 +264,6 @@ if __name__ == "__main__":
                fix_hypers     = fix_hypers
           )
 
-
      if args.task == "Extrapolation":
           #! load_setting from input.yml
           print("Load ML setting from input.yml")
@@ -307,8 +273,6 @@ if __name__ == "__main__":
           #! initialize ray for paralleization
           ray.init(address=os.environ["ip_head"], _redis_password=args.uuid)
           print("Nodes in the Ray cluster:", ray.nodes())
-          
-          
           
           fix_hypers =   {    "cutoff"            : 2,
                               "inner_cutoff"      : 1,
@@ -326,44 +290,6 @@ if __name__ == "__main__":
                ml_dict, 
                fix_hypers
           )
-          
-          
-          
-          
-          
-          # #! extrapolation with certain regularization and lengthscale
-          # inner_weight  = Real(name='inner_weight',          low = 0,     high=1,     prior='uniform')
-          # outer_weight  = Real(name='outer_weight',          low = 0,     high=1,  prior='uniform') 
-          # edge_s_s      = Real(name='edge weight of surface-surface',      low = 0,      high=1,     prior="uniform")
-          # edge_s_a      = Real(name='edge weight of surface-adsorbate',    low = 0,      high=1,     prior="uniform")
-          # edge_a_a      = Real(name='edge weight of adsorbate-adsorbate',  low = 0,      high=1,     prior="uniform")
-          
-          # fix_hypers      = { "cutoff"        : 2,
-          #                     "inner_cutoff"  : 1,
-          #                     "gpr_reg"       : 0.02682695795279726, #0.0525554561285561, 
-          #                     "gpr_len"       : 22.857142857142858, #13.410525101483,  
-          #                     "gpr_sigma"     : 1
-          #                   }
-
-          # opt_dimensions    =   {    
-          #                     "inner_weight"      : inner_weight,
-          #                     "outer_weight"      : outer_weight,
-          #                     "edge_s_s"          : edge_s_s,
-          #                     "edge_s_a"          : edge_s_a,
-          #                     "edge_a_a"          : edge_a_a
-          #                    } 
-
-          # default_para   =  [[1.0,  0,                  0, 1,  0],
-          #                    #[0.6,  0.0694050764384062, 0, 1, 0.47921973652378186]
-          #                    [0.6,  0.0167135893463353, 0.49642857, 0.4674309212968105, 0.49795096939871913]
-          #                   ]
-          
-          # Extrapolation(
-          #      ml_dict        = ml_dict,
-          #      opt_dimensions = opt_dimensions,
-          #      default_para   = default_para,
-          #      fix_hypers     = fix_hypers
-          # )
           
      if args.task == "CV5_FHP":
           #! load_setting from input.yml
@@ -396,20 +322,19 @@ if __name__ == "__main__":
                fix_hypers
           )
 
-
      if args.task == "CV5_simpleads":
 
           #! load_setting from input.yml
           print("Load ML setting from input.yml")
-          with open(base_path + "/database/complexads_interpolation/" + 'input.yml') as f:
+          with open(base_path + "/database/simpleads_interpolation/" + 'input.yml') as f:
                ml_dict = yaml.safe_load(f)
 
           #! initialize ray for paralleization
           ray.init(address=os.environ["ip_head"], _redis_password=args.uuid)
           print("Nodes in the Ray cluster:", ray.nodes())
 
-          #cutoff       = Integer(name='cutoff',             low = 1,     high=5)
-          #inner_cutoff = Integer(name='inner_cutoff',       low = 1,     high=3)
+          cutoff       = Integer(name='cutoff',              low = 1,     high=5)
+          inner_cutoff = Integer(name='inner_cutoff',        low = 1,     high=3)
           inner_weight  = Real(name='inner_weight',          low = 0,     high=1,     prior='uniform')
           outer_weight  = Real(name='outer_weight',          low = 0,     high=1,  prior='uniform')
           gpr_reg       = Real(name='regularization of gpr', low = 1e-3,  high=1e0,   prior='uniform')
@@ -419,12 +344,13 @@ if __name__ == "__main__":
           edge_s_a      = Real(name='edge weight of surface-adsorbate',    low = 0,      high=1,     prior="uniform")
           edge_a_a      = Real(name='edge weight of adsorbate-adsorbate',  low = 0,      high=1,     prior="uniform")
 
-          fix_hypers      = { "cutoff"        : 3,
-                              "inner_cutoff"  : 1,
+          fix_hypers      = {
                               "gpr_sigma"     : 1
                               }
 
           opt_dimensions    =   {
+                              "cutoff"            : cutoff,
+                              "inner_cutoff"      : inner_cutoff,
                               "inner_weight"      : inner_weight,
                               "outer_weight"      : outer_weight,
                               "gpr_reg"           : gpr_reg,
@@ -436,7 +362,7 @@ if __name__ == "__main__":
 
           default_para   =  [[1.0,  1,        0.03,   30,  0,         1,  0],
                              [1.0,  0,        0.00428050586923317, 14.5556734435333, 0, 1, 0.8678710596753815]
-                              ]
+                            ]
 
           SCV5(
                ml_dict        = ml_dict,
