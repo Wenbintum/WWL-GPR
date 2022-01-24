@@ -4,11 +4,12 @@ import pickle
 import ray
 import numpy as np
 from skopt.space import Real, Categorical,Integer
-from wwlgpr.Utility import ClassifySpecies
+from wwlgpr.Utility import ClassifySpecies, writetofile
 from wwlgpr.WWL_GPR import BayOptCv
 import wwlgpr
 import os, sys
 from sklearn.model_selection import KFold,LeaveOneOut,StratifiedKFold
+import time
 
 def load_base_path():
     return os.path.dirname(wwlgpr.__path__[0])
@@ -35,7 +36,7 @@ def SCV5(
      ml_dict,            
      opt_dimensions,
      default_para,
-     fix_hypers
+     fix_hypers,
 ):
      """task1 and task2: 5-fold cross validation for in-domain prediction stratified by adsorbate
         
@@ -45,7 +46,7 @@ def SCV5(
          opt_dimensions ([type]): dimensions object for skopt
          fix_hypers     ([type]): fixed hyperparameters
      """
-     
+     global output_name
      db_graphs, db_atoms, node_attributes, list_ads_energies, file_names = load_db(ml_dict, "train")
      test_RMSEs = []
      f_times = 1
@@ -95,9 +96,9 @@ def SCV5(
                )
           print(f"{f_times} fold RMSE: ",test_RMSE)
           test_RMSEs.append(test_RMSE)
-          f_times +=1 
+          f_times +=1
+          writetofile(output_name, test_file_names, test_list_ads_energies, test_pre)
      print("Cross validation RMSE: ",np.mean(test_RMSEs))
-
 
 def SCV5_FHP(
      ml_dict,  
@@ -109,7 +110,7 @@ def SCV5_FHP(
          ml_dict    ([type]): ML setting
          fix_hypers ([type]): fixed hyperparameters
      """
-     
+     global output_name 
      db_graphs, db_atoms, node_attributes, list_ads_energies, file_names = load_db(ml_dict,"train")
      test_RMSEs = []
      f_times = 1
@@ -150,7 +151,8 @@ def SCV5_FHP(
                )
           print(f"{f_times} fold RMSE: ",test_RMSE)
           test_RMSEs.append(test_RMSE)
-          f_times +=1 
+          f_times +=1
+          writetofile(output_name, test_file_names, test_list_ads_energies, test_pre)
      print("Cross validation RMSE: ", np.mean(test_RMSEs))
 
 
@@ -169,6 +171,7 @@ def Extrapolation(
          default_para ([type]): user defined trials
          fix_hypers   ([type]): fixed hyperparameters
      """
+     global output_name
      train_db_graphs, train_db_atoms, train_node_attributes, \
           train_list_ads_energies, train_file_names = load_db(ml_dict, "train")
      test_db_graphs, test_db_atoms, test_node_attributes, \
@@ -195,7 +198,7 @@ def Extrapolation(
                test_target          = test_list_ads_energies,
                opt_hypers           = fix_hypers
           )
-
+     writetofile(output_name, test_file_names, test_list_ads_energies, test_pre)
      print("extrapolation RMSE: ", test_RMSE)
 
      # #initialize bayesian optimization
@@ -236,9 +239,15 @@ if __name__ == "__main__":
      parser = argparse.ArgumentParser(description='Physic-inspired Wassterien Weisfeiler-Lehman Graph Gaussian Process Regression')
      parser.add_argument("--task", type=str, help="type of ML task", choices=["CV5", "CV5_FHP", "Extrapolation", "CV5_simpleads"])
      parser.add_argument("--uuid", type=str, help="uuid for ray job in HPC")
+     parser.add_argument("--output", type=str, help="output file name")
+
      args   = parser.parse_args()
      
      base_path = load_base_path()
+     if args.output:
+        output_name = base_path + "/output/" + args.output + ".txt"
+     else:
+        output_name = base_path + "/output/" + time.asctime() + ".txt"
 
      if args.task == "CV5":
 
@@ -410,7 +419,7 @@ if __name__ == "__main__":
           edge_s_a      = Real(name='edge weight of surface-adsorbate',    low = 0,      high=1,     prior="uniform")
           edge_a_a      = Real(name='edge weight of adsorbate-adsorbate',  low = 0,      high=1,     prior="uniform")
 
-          fix_hypers      = { "cutoff"        : 2,
+          fix_hypers      = { "cutoff"        : 3,
                               "inner_cutoff"  : 1,
                               "gpr_sigma"     : 1
                               }
@@ -425,8 +434,8 @@ if __name__ == "__main__":
                               "edge_a_a"          : edge_a_a
                               }
 
-          default_para   =  [[1.0,  0,        0.03,   30,  0,         1,  0],
-                              [0.6,  0.0544362754971445, 0.00824480194221483, 11.4733820390901, 0, 1, 0.6994924119498536]
+          default_para   =  [[1.0,  1,        0.03,   30,  0,         1,  0],
+                             [1.0,  0,        0.00428050586923317, 14.5556734435333, 0, 1, 0.8678710596753815]
                               ]
 
           SCV5(
