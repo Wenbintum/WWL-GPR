@@ -51,6 +51,7 @@ def SCV5(
      test_RMSEs = []
      f_times = 1
      skf=StratifiedKFold(n_splits=5, random_state=25, shuffle=True)
+     writetofolder(output_name)
      for train_index, vali_index in skf.split(list_ads_energies, ClassifySpecies(file_names)):
           train_db_graphs         = db_graphs[train_index]
           train_db_atoms          = db_atoms[train_index]
@@ -97,7 +98,6 @@ def SCV5(
           print(f"{f_times} fold RMSE: ",test_RMSE)
           test_RMSEs.append(test_RMSE)
           f_times +=1
-          writetofolder(output_name)
           writetofile(output_name, test_file_names, test_list_ads_energies, test_pre)
      print("Cross validation RMSE: ",np.mean(test_RMSEs))
 
@@ -116,8 +116,8 @@ def SCV5_FHP(
      test_RMSEs = []
      f_times = 1
      skf=StratifiedKFold(n_splits=5, random_state=25, shuffle=True)
+     writetofolder(output_name)
      for train_index, vali_index in skf.split(list_ads_energies, ClassifySpecies(file_names)):
-     
           train_db_graphs         = db_graphs[train_index]
           train_db_atoms          = db_atoms[train_index]
           train_node_attributes   = node_attributes[train_index]
@@ -153,7 +153,6 @@ def SCV5_FHP(
           print(f"{f_times} fold RMSE: ",test_RMSE)
           test_RMSEs.append(test_RMSE)
           f_times +=1
-          writetofolder(output_name)
           writetofile(output_name, test_file_names, test_list_ads_energies, test_pre)
      print("Cross validation RMSE: ", np.mean(test_RMSEs))
 
