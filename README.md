@@ -1,21 +1,19 @@
-# Wasserstein Weisfeiler-Lehman Graph Gaussian Process Regression (WWL-GPR)
+# Wasserstein Weisfeiler-Lehman graph kernel with Gaussian Process Regression (WWL-GPR)
 
-This software package provides implementations of Physic-inspired Wasserstein Weisfeiler-Lehman Graph model that takes arbitrary initial guess of structures to predict material properties with a particular interest in handling complex adsorbates. 
+This software package provides the implementation of the WWL-GPR model, a data-efficient, physics-inspired machine learning (ML) model for the prediction of binding motifs and associated adsorption enthalpies of complex adsorbates at transition metals (TMs) and their alloys based on a customized Wasserstein Weisfeiler-Lehman graph kernel and Gaussian Process Regression. The task that is solved is to directly predict the relaxed adsorption enthalpies corresponding to a range of plausible initial guesses of the adsorption motif based on graph representation. Thereby, for a given surface/adsorbate combination of interest, both the most stable and all meta-stable adsorption motifs as well as their associated adsorption enthalpies can be predicted. Apart from a graph representation of the intial geometry, the model uses input features in the form of node attributes, which represent physically motivated properties, e.g. d-band moments (surfaces), HOMO/LUMO energy levels (adsorbate molecules) and features of the local geometry, all derived from either the clean surfaces or the adsorbates in the gas phase. Optimization of the hyperparameters in the model is done with Bayesian optimization implemented with scikit-optimize.
 
-This model integrates a customized graph kernel with Gaussian Process Regression. The search of hyperparameters is done with Bayesian optimization implemented with scikit-optimize.
-
-A case study predicting adsorption enthalpies of complex adsorbates involved in Ethanol synthesis is exemplified, where the input features of the Machine learning model are only derived from clean surface and isolated molecule.
-
+A case study predicting adsorption enthalpies of complex adsorbates involved in ethanol synthesis is provided.
+Please refer to our manuscript for further details (link to be inserted upon publication).
 
 ## Installation
-We made the easiest way to install prerequisites via [conda](https://conda.io/docs/index.html). All the dependencies are given in `env.yml`.
+The easiest way to install the prerequisites is via [conda](https://conda.io/docs/index.html). All the dependencies are given in `env.yml`.
 
 Firstly, download or clone this repository via:
 ```bash
 git clone https://github.com/Wenbintum/WWL-GPR.git
 ```
 
-Ensure you have installed conda, and then run the following commands to create a new environment named wwl-gpr.
+Ensure you have installed conda, step into the WWL-GPR directory, and then run the following command to create a new environment named wwl-gpr.
 ```bash
 conda env create -f env.yml
 ```
@@ -23,7 +21,7 @@ Activate the conda environment with:
 ```bash
 conda activate wwl-gpr
 ```
-Step into WWL-GPR directory and install this package with:
+Install the package with:
 ```bash
 pip install -e .
 ```
@@ -41,10 +39,10 @@ We provide a helper utility to auto-generate SLURM scripts and launch.  There ar
 
 
 #### Available machine learning tasks:
-We provide three machine learning tasks as showcases in compliance with our paper, that are: 
-- a) 5-fold Cross-validation applied in-domain prediction for complex adsorbates database (termed as "CV5") 
-- b) 5-fold Cross-validation applied in-domain prediction for simple adsorbates database (termed as "CV5_simpleads")
-- c) Extrapolation to out-of-domain samples, alloy and new metal Pt, when only training on pure metal database and additional including atomic-species on Pt (termed as "Extrapolation")  
+We provide three machine learning tasks as showcases in compliance with our manuscript, that are: 
+- a) 5-fold Cross-validation applied to in-domain prediction for the complex adsorbates database (termed as "CV5") 
+- b) 5-fold Cross-validation applied to in-domain prediction for the simple adsorbates database (termed as "CV5_simpleads")
+- c) Extrapolation to out-of-domain samples, an alloy (CuCo) and a new metal (Pt), when only training on the complex adsorbates database containing the elemental metals Cu, Co, Rh and Pt as well as additionally the atomic species (H, O, and C) calculated at Pt (termed as "Extrapolation")  
 
 All tasks can be viewed by running:
 ```bash
@@ -52,7 +50,7 @@ All tasks can be viewed by running:
 ```
 
 #### Run task on HPC facility:
-By coupling python-interface SLURM scripts and self-contained ML tasks, now you can run these three tasks on High Performance Computing (HPC) facility. For instance, running task a) by given computational resource of 40 CPUs and 3 hours title with "test".
+By coupling python-interface SLURM scripts and self-contained ML tasks, now you can run these three tasks on High Performance Computing (HPC) facility. For instance, running task a) by given computational resources of 40 CPUs and 3 hours with the title "test".
 ```bash
   python launch.py --num-cpus 40 -t 03:00:00  --exp-name test --command "python -u main.py --task CV5 --uuid \$redis_password"
 ```
@@ -61,13 +59,13 @@ By coupling python-interface SLURM scripts and self-contained ML tasks, now you 
   python launch.py --num-cpus 40 -t 03:00:00  --exp-name test --command "python -u main.py --task Extrapolation --uuid \$redis_password"
 ```
 #### Run task on local computer:
-We also provide a showcase for running 5-fold Cross-validation of in-domain prediction for complex adsorbates database on local desktop or laptop with fixed hyperparameters (FHP). In this case, the ML learning will be run on 8 CPUs as given in [input.yml](https://github.com/Wenbintum/WWL-GPR/blob/main/database/complexads_interpolation/input.yml).
+We also provide an example for running 5-fold cross-validation within the complex adsorbates database on a local desktop or laptop with fixed hyperparameters (FHP). In this case, the ML learning task will be run on 8 CPUs as given in [input.yml](https://github.com/Wenbintum/WWL-GPR/blob/main/database/complexads_interpolation/input.yml).
 - Run task on local desktop or laptop:
 ```bash
   python main.py --task CV5_FHP
 ```
 
-The output file is located in "Results" directory for further analysis. We use Bayesian optimization to optimize hyperparameters, for which you may want to change its setting via [this function](https://github.com/Wenbintum/WWL-GPR/blob/8c52f1f9462215f29ed51517077ea01c077c2d50/wwlgpr/WWL_GPR.py#L302)
+The output file is located in the "Results" directory for further analysis. We use Bayesian optimization to optimize hyperparameters. You may want to change the settings via [this function](https://github.com/Wenbintum/WWL-GPR/blob/8c52f1f9462215f29ed51517077ea01c077c2d50/wwlgpr/WWL_GPR.py#L302)
 
 ## Authors
 This software was primarily written by Wenbin Xu who was advised by Prof. Mie Andersen.
