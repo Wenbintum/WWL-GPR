@@ -76,4 +76,4 @@ The complex adsorbates database is constructed via [AIIDA](https://aiida.readthe
 The WWL-GPR implementation is based on the [Wasserstein Weisfeiler-Lehman Graph Kernels](https://arxiv.org/abs/1906.01277)
 
 ## License
-PWWG-GPR is released under the MIT License.
+WWL-GPR is released under the MIT License.
