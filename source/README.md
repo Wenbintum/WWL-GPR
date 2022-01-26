@@ -9,4 +9,4 @@ we use 1679 (Cu, Co, Pd, Rh) out of 1878 samples performing interpolation task, 
 3. we provide some pre-defined ML tasks for the purpose of tutorial and data reproducing, please follow the instruction on the main page and
 you are referred to our paper for detailed explanation of the tasks and their setting.
 
-4. we provide a tutorial about how to construct SOAP descriptor to represent local geometry (which is one of the important ingredients)
+4. we provide a tutorial about how to construct SOAP descriptor to represent local geometry (which is one of the important ingredients of WWL-GPR model)
