@@ -71,7 +71,7 @@ The output file is located in the "Results" directory for further analysis. We u
 This software was primarily written by Wenbin Xu who was advised by Prof. Mie Andersen.
 
 ## Acknowledgements
-The simple adsorbates database is taken from our previous papers [Deimel et al., ACS Catal. 2020, 10, 22, 13729–13736](https://pubs.acs.org/doi/10.1021/acscatal.8b04478) and [Andersen et al., ACS Catal. 2019, 9, 4, 2752–2759](https://pubs.acs.org/doi/10.1021/acscatal.8b04478).
+The simple adsorbates database is taken from our previous papers [Deimel et al., ACS Catal. 2020, 10, 22, 13729–13736](https://pubs.acs.org/doi/abs/10.1021/acscatal.0c04045) and [Andersen et al., ACS Catal. 2019, 9, 4, 2752–2759](https://pubs.acs.org/doi/10.1021/acscatal.8b04478).
 The complex adsorbates database is constructed via [AIIDA](https://aiida.readthedocs.io/projects/aiida-core/en/latest/) and [CatKit](https://catkit.readthedocs.io/en/latest/)
 The WWL-GPR implementation is based on the [Wasserstein Weisfeiler-Lehman Graph Kernels](https://arxiv.org/abs/1906.01277)
 
