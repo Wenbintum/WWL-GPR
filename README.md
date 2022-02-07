@@ -89,7 +89,7 @@ We use Bayesian optimization to optimize hyperparameters. You may want to change
 
 #### Expected outpout and run time:
 
-The output file consists of ground truth and ML predicted values, which is located in the "Results" directory for further analysis, and resulting Root Mean Square Error (RMSE) is printed. The run time of CV5_FHP on local computer with 8 CPUs is around 7 minutes.
+The output file consists of ground truth and ML predicted values, which is located in the "Results" directory for further analysis, and resulting Root Mean Square Error (RMSE) is printed. The run time of CV5_FHP on local computer with 8 CPUs is around 7 minutes, for which the RMSE is of 0.18 eV.
 
 
 ## Authors
