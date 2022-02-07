@@ -19,14 +19,14 @@ A case study predicting adsorption enthalpies of complex adsorbates involved in 
 
 Please refer to our manuscript for further details (link to be inserted upon publication).
 ## System Requirements
-The `WWL-GPR` package requires only a standard computer with enough RAM to support the training and prediction of the ML model through the required `conda`  environment (see below). To the benefit of computational scientists likely to accelerate the ML process or interact with other computationally intensive codes on High-Performance Computing (HPC) facility, this package requires a standard `SLURM` Workload Manager.
+The `WWL-GPR` package requires only a standard computer with enough RAM to support the training and application of the ML model through the required `conda`  environment (see below). To the benefit of computational scientists who would like to accelerate the ML process or interact with other computationally intensive codes on High-Performance Computing (HPC) facilities, we also provide the possibility for interfacing with a standard `SLURM` Workload Manager.
 
-All software requirements associated with their version are specified in self-contained [env.yml](https://github.com/Wenbintum/WWL-GPR/blob/main/env.yml)
+All software dependencies (including version numbers the software has been tested on) are specified in self-contained [env.yml](https://github.com/Wenbintum/WWL-GPR/blob/main/env.yml)
 
 
 
 ## Installation
-The easiest way to install the prerequisites is via [conda](https://conda.io/docs/index.html). All the dependencies are given in `env.yml`. (The expected installation time is around 2 minutes)
+The easiest way to install the prerequisites is via [conda](https://conda.io/docs/index.html). All the dependencies are given in `env.yml`. The expected installation time is around 2 minutes.
 
 Firstly, download or clone this repository via:
 ```bash
@@ -89,7 +89,7 @@ We use Bayesian optimization to optimize hyperparameters. You may want to change
 
 #### Expected outpout and run time:
 
-The output file consists of ground truth and ML predicted values, which is located in the "Results" directory for further analysis, and resulting Root Mean Square Error (RMSE) is printed. The run time of CV5_FHP on local computer with 8 CPUs is around 7 minutes, for which the RMSE is of 0.18 eV.
+The output file consists of ground truth and ML predicted values, which is located in the "Results" directory for further analysis, and resulting Root Mean Square Error (RMSE) is printed. The run time of CV5_FHP on local computer with 8 CPUs is around 7 minutes, for which the expected RMSE is around 0.18 eV.
 
 
 ## Authors
