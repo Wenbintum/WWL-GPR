@@ -26,7 +26,7 @@ All software requirements associated with their version are specified in self-co
 
 
 ## Installation
-The easiest way to install the prerequisites is via [conda](https://conda.io/docs/index.html). All the dependencies are given in `env.yml`.
+The easiest way to install the prerequisites is via [conda](https://conda.io/docs/index.html). All the dependencies are given in `env.yml`. (The expected installation time is around 2 minutes)
 
 Firstly, download or clone this repository via:
 ```bash
