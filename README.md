@@ -1,9 +1,29 @@
 # Wasserstein Weisfeiler-Lehman graph kernel with Gaussian Process Regression (WWL-GPR)
+[![igraph](https://img.shields.io/badge/igraph-0.91-red.svg)](https://igraph.org/) [![ray](https://img.shields.io/badge/Ray-2.0.0-blue.svg)](https://docs.ray.io/en/master/index.html) [![ray](https://img.shields.io/badge/POT-lasted-blue.svg)](https://pythonot.github.io/) 
 
+
+# Table of Contents
+- [Overview](#overview)
+- [System Requirements](#system-requirements)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Authors](#authors)
+- [Acknowledgements](#acknowledgements)
+- [License](#license)
+
+
+## Overview
 This software package provides the implementation of the WWL-GPR model, a data-efficient, physics-inspired machine learning (ML) model for the prediction of binding motifs and associated adsorption enthalpies of complex adsorbates at transition metals (TMs) and their alloys based on a customized Wasserstein Weisfeiler-Lehman graph kernel and Gaussian Process Regression. The task that is solved is to directly predict the relaxed adsorption enthalpies corresponding to a range of plausible initial guesses of the adsorption motif based on graph representation. Thereby, for a given surface/adsorbate combination of interest, both the most stable and all meta-stable adsorption motifs as well as their associated adsorption enthalpies can be predicted. Apart from a graph representation of the intial geometry, the model uses input features in the form of node attributes, which represent physically motivated properties, e.g. d-band moments (surfaces), HOMO/LUMO energy levels (adsorbate molecules) and features of the local geometry, all derived from either the clean surfaces or the adsorbates in the gas phase. Optimization of the hyperparameters in the model is done with Bayesian optimization implemented with scikit-optimize.
 
 A case study predicting adsorption enthalpies of complex adsorbates involved in ethanol synthesis is provided.
+
 Please refer to our manuscript for further details (link to be inserted upon publication).
+## System Requirements
+The `WWL-GPR` package requires only a standard computer with enough RAM to support the training and prediction of the ML model through the required `conda`  environment (see below). To the benefit of computational scientists likely to accelerate the ML process or interact with other computationally intensive codes on High-Performance Computing (HPC) facility, this package requires a standard `SLURM` Workload Manager.
+
+All software requirements associated with their version are specified in self-contained [env.yml](https://github.com/Wenbintum/WWL-GPR/blob/main/env.yml)
+
+
 
 ## Installation
 The easiest way to install the prerequisites is via [conda](https://conda.io/docs/index.html). All the dependencies are given in `env.yml`.
@@ -64,8 +84,13 @@ We also provide an example for running 5-fold cross-validation within the comple
 ```bash
   python main.py --task CV5_FHP
 ```
+We use Bayesian optimization to optimize hyperparameters. You may want to change the settings via [this function](https://github.com/Wenbintum/WWL-GPR/blob/8c52f1f9462215f29ed51517077ea01c077c2d50/wwlgpr/WWL_GPR.py#L302)
 
-The output file is located in the "Results" directory for further analysis. We use Bayesian optimization to optimize hyperparameters. You may want to change the settings via [this function](https://github.com/Wenbintum/WWL-GPR/blob/8c52f1f9462215f29ed51517077ea01c077c2d50/wwlgpr/WWL_GPR.py#L302)
+
+#### Expected outpout and run time:
+
+The output file consists of ground truth and ML predicted values, which is located in the "Results" directory for further analysis, and resulting Root Mean Square Error (RMSE) is printed. The run time of CV5_FHP on local computer with 8 CPUs is around 7 minutes.
+
 
 ## Authors
 This software was primarily written by Wenbin Xu who was advised by Prof. Mie Andersen.
