@@ -10,3 +10,5 @@ we use 1679 (Cu, Co, Pd, Rh) out of 1878 samples performing interpolation task, 
 you are referred to our paper for detailed explanation of the tasks and their setting.
 
 4. we provide a tutorial about how to construct SOAP descriptor to represent local geometry (which is one of the important ingredients of WWL-GPR model)
+
+5. we also provide a code snippet to generate work function and d band moments. These are basically postprocessing step of the output files. Given different DFT code and version, they can differ a lot. People should test and adapt it into their case study.  
