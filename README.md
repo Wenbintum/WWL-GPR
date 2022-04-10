@@ -59,7 +59,7 @@ We provide a helper utility to auto-generate SLURM scripts and launch.  There ar
 
 
 #### Available machine learning tasks:
-We provide three machine learning tasks as showcases in compliance with our manuscript, that are: 
+We provide four machine learning tasks as showcases in compliance with our manuscript, that are: 
 - a) 5-fold Cross-validation applied to in-domain prediction for the complex adsorbates database (termed as "CV5") 
 - b) 5-fold Cross-validation applied to in-domain prediction for the simple adsorbates database (termed as "CV5_simpleads")
 - c) Extrapolation to out-of-domain samples, an alloy (CuCo) and a new metal (Pt), when only training on the complex adsorbates database containing the elemental metals Cu, Co, Rh and Pd as well as additionally the atomic species (H, O, and C) calculated at Pt (termed as "Extrapolation_t1")  
