@@ -62,7 +62,8 @@ We provide a helper utility to auto-generate SLURM scripts and launch.  There ar
 We provide three machine learning tasks as showcases in compliance with our manuscript, that are: 
 - a) 5-fold Cross-validation applied to in-domain prediction for the complex adsorbates database (termed as "CV5") 
 - b) 5-fold Cross-validation applied to in-domain prediction for the simple adsorbates database (termed as "CV5_simpleads")
-- c) Extrapolation to out-of-domain samples, an alloy (CuCo) and a new metal (Pt), when only training on the complex adsorbates database containing the elemental metals Cu, Co, Rh and Pt as well as additionally the atomic species (H, O, and C) calculated at Pt (termed as "Extrapolation")  
+- c) Extrapolation to out-of-domain samples, an alloy (CuCo) and a new metal (Pt), when only training on the complex adsorbates database containing the elemental metals Cu, Co, Rh and Pd as well as additionally the atomic species (H, O, and C) calculated at Pt (termed as "Extrapolation_t1")  
+- d) Extrapolation to out-of-domain samples, an alloy (PdRh) and a new metal (Ru), when only training on the complex adsorbates database containing the elemental metals Cu, Co, Rh and Pd as well as additionally the atomic species (H, O, and C) calculated at Ru (termed as "Extrapolation_t2") 
 
 All tasks can be viewed by running:
 ```bash
