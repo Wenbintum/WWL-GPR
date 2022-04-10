@@ -267,11 +267,11 @@ if __name__ == "__main__":
           #! load_setting from input.yml
           print("Load ML setting from input.yml")
 
-          if args.task = "Extrapolation_t1":
+          if args.task == "Extrapolation_t1":
              with open(base_path + "/database/complexads_extrapolation/" + 'input_CuCo_Pt.yml') as f:
                   ml_dict = yaml.safe_load(f)
 
-          if args.task = "Extrapolation_t2":
+          if args.task == "Extrapolation_t2":
              with open(base_path + "/database/complexads_extrapolation/" + 'input_PdRh_Ru.yml') as f:
                   ml_dict = yaml.safe_load(f)
 
