@@ -71,13 +71,13 @@ All tasks can be viewed by running:
 ```
 
 #### Run task on HPC facility:
-By coupling python-interface SLURM scripts and self-contained ML tasks, now you can run these three tasks on High Performance Computing (HPC) facility. For instance, running task a) by given computational resources of 40 CPUs and 3 hours with the title "test".
+By coupling python-interface SLURM scripts and self-contained ML tasks, now you can run these four tasks on High Performance Computing (HPC) facility. For instance, running task a) by given computational resources of 40 CPUs and 3 hours with the title "test".
 ```bash
   python launch.py --num-cpus 40 -t 03:00:00  --exp-name test --command "python -u main.py --task CV5 --uuid \$redis_password"
 ```
-&emsp;&ensp; Run extrapolation task via:
+&emsp;&ensp; Run extrapolation task d) via:
 ```bash
-  python launch.py --num-cpus 40 -t 03:00:00  --exp-name test --command "python -u main.py --task Extrapolation --uuid \$redis_password"
+  python launch.py --num-cpus 40 -t 03:00:00  --exp-name test --command "python -u main.py --task Extrapolation_t2 --uuid \$redis_password"
 ```
 #### Run task on local computer:
 We also provide an example for running 5-fold cross-validation within the complex adsorbates database on a local desktop or laptop with fixed hyperparameters (FHP). In this case, the ML learning task will be run on 8 CPUs as given in [input.yml](https://github.com/Wenbintum/WWL-GPR/blob/main/database/complexads_interpolation/input.yml).
