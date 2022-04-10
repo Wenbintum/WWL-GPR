@@ -203,7 +203,7 @@ def Extrapolation(
 if __name__ == "__main__":
      
      parser = argparse.ArgumentParser(description='Physic-inspired Wasserstein Weisfeiler-Lehman Graph Gaussian Process Regression')
-     parser.add_argument("--task",   type=str, help="type of ML task", choices=["CV5", "CV5_FHP", "Extrapolation", "CV5_simpleads"])
+     parser.add_argument("--task",   type=str, help="type of ML task", choices=["CV5", "CV5_FHP", "Extrapolation_t1", "Extrapolation_t2", "CV5_simpleads"])
      parser.add_argument("--uuid",   type=str, help="uuid for ray job in HPC")
      parser.add_argument("--output", type=str, help="output file name")
      args   = parser.parse_args()
@@ -263,12 +263,18 @@ if __name__ == "__main__":
                fix_hypers     = fix_hypers
           )
 
-     if args.task == "Extrapolation":
+     if args.task.startswith("Extrapolation"):
           #! load_setting from input.yml
           print("Load ML setting from input.yml")
-          with open(base_path + "/database/complexads_extrapolation/" + 'input.yml') as f:
-               ml_dict = yaml.safe_load(f)
-         
+
+          if args.task = "Extrapolation_t1":
+             with open(base_path + "/database/complexads_extrapolation/" + 'input_CuCo_Pt.yml') as f:
+                  ml_dict = yaml.safe_load(f)
+
+          if args.task = "Extrapolation_t2":
+             with open(base_path + "/database/complexads_extrapolation/" + 'input_PdRh_Ru.yml') as f:
+                  ml_dict = yaml.safe_load(f)
+
           #! initialize ray for paralleization
           ray.init(address=os.environ["ip_head"], _redis_password=args.uuid)
           print("Nodes in the Ray cluster:", ray.nodes())
