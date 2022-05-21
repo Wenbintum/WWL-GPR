@@ -13,4 +13,4 @@ you are referred to our paper for detailed explanation of the tasks and their se
 
 5. we also provide a code snippet to generate work function and d band moments. These are basically postprocessing step of the output files. Given different DFT code and version, they can differ a lot. People should test and adapt it into their case study.  
 
-6. we provide a tutoral about the implementation of XGBoost method and it's hyperparameter search.
+6. we provide a tutorial about the implementation of XGBoost method and its hyperparameter search.
